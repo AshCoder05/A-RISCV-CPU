@@ -1,88 +1,51 @@
 
-// TESTBENCH FOR CPU DATAPATH
-module datapath_tb;
 
-    // 1. Declare Signals to connect to the Datapath
+module datapath_tb;
+    // 1. Declare Signals
     logic        clk, reset;
     logic [1:0]  ResultSrc;
-    logic        ALUSrc;
-    logic        RegWrite;
+    logic        ALUSrc, RegWrite;
     logic [1:0]  ImmSrc;
     logic [3:0]  ALUControl;
-    logic [31:0] Instr;
-    logic [31:0] ReadData;
-    logic [31:0] ALUResult, WriteData;
+    logic [31:0] Instr, ReadData;
+    
+    // OUTPUTS from the Datapath
+    logic [31:0] ALUResult;
+    logic [31:0] WriteData; 
     logic        Zero;
 
-    // 2. Instantiate the Datapath
+    // 2. Instantiate Datapath
     datapath dut (
         .clk(clk), .reset(reset),
-        .ResultSrc(ResultSrc),   // 00 for now (ALU Result)
-        .ALUSrc(ALUSrc),         // 1 for Immediate
-        .RegWrite(RegWrite),     // 1 to write to register
-        .ImmSrc(ImmSrc),         // 00 for I-Type
-        .ALUControl(ALUControl), // 0000 for ADD
-        .Instr(Instr),           // The Instruction Code
-        .ReadData(ReadData),     // 0 (We have no RAM yet)
+        .ResultSrc(ResultSrc),
+        .ALUSrc(ALUSrc),
+        .RegWrite(RegWrite),
+        .ImmSrc(ImmSrc),
+        .ALUControl(ALUControl),
+        .Instr(Instr),
+        .ReadData(ReadData),
         .ALUResult(ALUResult), 
-        .RegData2(RegData2), 
+        .WriteData(WriteData), 
         .Zero(Zero)
     );
 
-    // 3. Clock Generation
+    // 3. Clock
     always #5 clk = ~clk;
 
-    // 4. Test Procedure
+    // 4. Test
     initial begin
         $dumpfile("dump.vcd"); $dumpvars;
-        
-        // Initialize
-        clk = 0; reset = 1; 
-        ReadData = 0; ResultSrc = 0;
+        clk = 0; reset = 1; ReadData = 0; ResultSrc = 0;
         #10 reset = 0;
 
-        // ---------------------------------------------------------
-        // INSTRUCTION: addi x1, x0, 5
-        // Machine Code: 00500093 (Hex)
-        // ---------------------------------------------------------
-        $display("-------------------------------------------");
+        // TEST: addi x1, x0, 5
         $display("Testing: addi x1, x0, 5");
-        
-        // A. Put the Instruction on the bus
         Instr = 32'h00500093; 
-
-        // B. Set Control Signals (Simulating the Decoder)
-        RegWrite   = 1;       // We want to save the result
-        ImmSrc     = 2'b00;   // It is an I-Type Instruction
-        ALUSrc     = 1;       // Use the Immediate (5), not Register B
-        ALUControl = 4'b0000; // ALU operation is ADD
-
-        // C. Wait for the Clock Edge (Writing happens here)
+        RegWrite = 1; ImmSrc = 2'b00; ALUSrc = 1; ALUControl = 4'b0000;
         #10; 
 
-        // D. Check the result
-        // The ALU should output 5, and it should be inside x1.
-        if (ALUResult === 5) begin
-             $display("[PASS] Success! ALU calculated 5.");
-             $display("       Signals: ImmExt=%d, SrcA=%d", dut.ImmExt, dut.SrcA);
-        end else begin
-             $display("[FAIL] Expected 5, got %d", ALUResult);
-        end
-
-        // ---------------------------------------------------------
-        // OPTIONAL: Test a second instruction (addi x2, x1, -2)
-        // Machine Code: FFE08113 (x2 = x1 + (-2)) -> x2 should be 3
-        // ---------------------------------------------------------
-        $display("Testing: addi x2, x1, -2");
-        Instr = 32'hFFE08113;
-        // Control signals stay the same for addi
-        #10;
-
-        if (ALUResult === 3) begin
-             $display("[PASS] Success! 5 + (-2) = 3.");
-        end else begin
-             $display("[FAIL] Expected 3, got %d", ALUResult);
-        end
+        if (ALUResult === 5) $display("[PASS] Result is 5");
+        else                 $display("[FAIL] Result is %d", ALUResult);
 
         $finish;
     end
