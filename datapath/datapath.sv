@@ -109,7 +109,7 @@ module datapath (
     input  logic [3:0]  ALUControl,
     input  logic [31:0] Instr,       // The full instruction!
     input  logic [31:0] ReadData,    // Data from RAM (ignore for now)
-  output logic [31:0] ALUResult, RegData2,
+  output logic [31:0] ALUResult, WriteData,
     output logic        Zero
 );
 
@@ -126,18 +126,19 @@ module datapath (
         .a3(Instr[11:7]),   // RD  comes from these bits
         .wd3(Result), 
         .rd1(SrcA), 
-      .rd2(RegData2)
+      .rd2(WriteData)
     );
 
     // 2. SIGN EXTENDER (Instantiate it here!)
+    // TODO: Connect Instr[31:7] and ImmSrc
     extend ext ( .instr(Instr[31:7]), 
     .immsrc(ImmSrc),     
     .immext(ImmExt));
 
     // 3. ALU MUX (The critical Logic)
-  // If ALUSrc is 0, we use ReadData2 (RegData2).
+    // If ALUSrc is 0, we use ReadData2 (WriteData).
     // If ALUSrc is 1, we use ImmExt.
- 	 assign SrcB = ALUSrc ? ImmExt : RegData2 ;
+ 	assign SrcB = ALUSrc ? ImmExt : WriteData ;
 
     // 4. ALU
     alu my_alu (
