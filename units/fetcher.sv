@@ -1,4 +1,4 @@
-// --- 5. PROGRAM COUNTER (PC) ---
+// PROGRAM COUNTER (PC) 
 module flopr #(parameter WIDTH = 32) (
     input  logic             clk, reset,
     input  logic [WIDTH-1:0] d, 
@@ -9,7 +9,7 @@ module flopr #(parameter WIDTH = 32) (
         else       q <= d;
 endmodule
 
-// --- 6. ADDER ---
+//ADDER
 module adder (
     input  logic [31:0] a, b,
     output logic [31:0] y
@@ -17,7 +17,7 @@ module adder (
     assign y = a + b;
 endmodule
 
-// --- 7. INSTRUCTION MEMORY (ROM) ---
+//INSTRUCTION MEMORY (ROM)
 module imem (
     input  logic [31:0] a,
     output logic [31:0] rd
