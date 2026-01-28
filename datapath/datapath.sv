@@ -14,7 +14,7 @@ typedef enum logic [3:0] {
 
 module alu (
     input  logic [31:0] A, B,
-    input  alu_ops     ALUControl,
+    input  logic [3:0] ALUControl,
     output logic [31:0] Result,
     output logic        Zero
 );
