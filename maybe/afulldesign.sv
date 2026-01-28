@@ -217,11 +217,12 @@ module imem (
 );
     logic [31:0] RAM[63:0];
     initial begin
-        // THE TEST PROGRAM:
+      // THE TEST PROGRAM:
         // 1. addi x1, x0, 5    (x1 = 5)
         RAM[0] = 32'h00500093; 
         
-        // 2. sw x1, 84(x0)     (Write '5' to Mem Address 84)
+      // 2. sw x1, 84(x0)     (Write '5' to Mem Address 20)
+        // Math: Base(x0=0) + Offset(20) = Address 20.
         // Machine Code: 00102a23
         RAM[1] = 32'h00102a23; 
 
