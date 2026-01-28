@@ -75,7 +75,22 @@ module regfile (
 
 endmodule
 
-
+// --- 3. SIGN EXTENDER (You were missing this!) ---
+module extend (
+    input  logic [31:7] instr,
+    input  logic [1:0]  immsrc,
+    output logic [31:0] immext
+);
+    always_comb begin
+        case(immsrc)
+            2'b00: immext = {{20{instr[31]}}, instr[31:20]}; // I-Type
+            2'b01: immext = {{20{instr[31]}}, instr[31:25], instr[11:7]}; // S-Type
+            2'b10: immext = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0}; // B-Type
+            2'b11: immext = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0}; // J-Type
+            default: immext = 32'bx;
+        endcase
+    end
+endmodule
 
 module datapath (
     input  logic        clk, reset,
@@ -90,7 +105,7 @@ module datapath (
     output logic        Zero
 );
 
-    logic [31:0] PC; // Program Counter (We'll add this next)
+    logic [31:0] PC; 
     logic [31:0] SrcA, SrcB;
     logic [31:0] Result;
     logic [31:0] ImmExt;  // Output of Sign Extender
